@@ -2,7 +2,7 @@ FROM runpod/pytorch:3.10-2.0.1-120-devel
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y ffmpeg wget
+RUN apt-get update && apt-get install -y ffmpeg
 
 COPY requirements.txt .
 
