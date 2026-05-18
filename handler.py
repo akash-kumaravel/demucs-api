@@ -14,7 +14,7 @@ def handler(job):
 
         if not audio_url:
             return {
-                "error": "audio_url missing"
+                "message": "audio_url missing"
             }
 
         filename = f"{uuid.uuid4()}.mp3"
@@ -41,20 +41,15 @@ def handler(job):
             text=True
         )
 
-        # If failed
-        if result.returncode != 0:
-            return {
-                "error": result.stderr,
-                "stdout": result.stdout
-            }
-
         # Output folder
         output_path = f"separated/htdemucs/{os.path.splitext(filename)[0]}"
 
-        # Verify output exists
+        # Check output exists
         if not os.path.exists(output_path):
             return {
-                "error": "Output folder not found"
+                "message": "Demucs failed",
+                "stdout": result.stdout,
+                "stderr": result.stderr
             }
 
         files = os.listdir(output_path)
@@ -62,12 +57,14 @@ def handler(job):
         return {
             "message": "Demucs completed successfully",
             "output_path": output_path,
-            "files": files
+            "files": files,
+            "stdout": result.stdout
         }
 
     except Exception as e:
         return {
-            "error": str(e)
+            "message": "Exception occurred",
+            "details": str(e)
         }
 
 runpod.serverless.start({"handler": handler})
