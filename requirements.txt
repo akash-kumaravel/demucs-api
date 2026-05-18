@@ -1,6 +1,5 @@
 runpod
+requests
 demucs
 torch
 torchaudio
-ffmpeg-python
-wget
