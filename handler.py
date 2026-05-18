@@ -1,7 +1,8 @@
 import runpod
-import subprocess
+import requests
 import uuid
 import os
+import subprocess
 
 def handler(job):
 
@@ -14,18 +15,35 @@ def handler(job):
 
     filename = f"{uuid.uuid4()}.mp3"
 
-    subprocess.run(
-        ["wget", audio_url, "-O", filename],
-        check=True
+    # Download audio
+    response = requests.get(audio_url)
+
+    with open(filename, "wb") as f:
+        f.write(response.content)
+
+    # Run Demucs in CPU mode
+    command = [
+        "python",
+        "-m",
+        "demucs",
+        "--device",
+        "cpu",
+        filename
+    ]
+
+    result = subprocess.run(
+        command,
+        capture_output=True,
+        text=True
     )
 
-    subprocess.run(
-        ["demucs", filename],
-        check=True
-    )
+    if result.returncode != 0:
+        return {
+            "error": result.stderr
+        }
 
     return {
-        "message": "separation completed"
+        "message": "Demucs completed successfully"
     }
 
 runpod.serverless.start({"handler": handler})
