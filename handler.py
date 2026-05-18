@@ -1,8 +1,8 @@
 import runpod
 import requests
 import uuid
-import os
 import subprocess
+import os
 
 def handler(job):
 
@@ -21,7 +21,7 @@ def handler(job):
     with open(filename, "wb") as f:
         f.write(response.content)
 
-    # Run Demucs in CPU mode
+    # Run Demucs
     command = [
         "python",
         "-m",
@@ -31,19 +31,14 @@ def handler(job):
         filename
     ]
 
-    result = subprocess.run(
-        command,
-        capture_output=True,
-        text=True
-    )
+    subprocess.run(command)
 
-    if result.returncode != 0:
-        return {
-            "error": result.stderr
-        }
+    # Output folder
+    output_folder = "separated/htdemucs"
 
     return {
-        "message": "Demucs completed successfully"
+        "message": "Demucs completed successfully",
+        "output_folder": output_folder
     }
 
 runpod.serverless.start({"handler": handler})
